@@ -1,0 +1,772 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PS Macro Tuner (Admin – Sessões/Presets)</title>
+  <style>
+    :root{
+      --bg:#0f1115; --panel:#151922; --surface:#1b2130; --muted:#98a2b3; --text:#e6e9ef; --brand:#ff7a00; --ok:#22c55e; --warn:#f59e0b; --err:#ef4444;
+      --radius:14px; --space:14px; --ring:0 0 0 2px rgba(255,122,0,.35);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;background:linear-gradient(180deg,#0c0f14,#0f1115);color:var(--text);font:14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,sans-serif}
+    .wrap{max-width:1200px;margin:0 auto;padding:28px}
+    h1{font-size:22px;margin:0 0 14px;display:flex;gap:10px;align-items:center}
+    .tag{padding:2px 8px;border-radius:999px;background:#232a3b;color:#b6c1d6;font-weight:600;font-size:12px}
+
+    .grid{display:grid;grid-template-columns:360px 1fr;gap:20px}
+    .card{background:var(--panel);border:1px solid #222838;border-radius:var(--radius);box-shadow:0 10px 30px rgba(0,0,0,.35)}
+    .card h2{margin:0;padding:14px 16px;border-bottom:1px solid #222838;font-size:16px}
+    .section{padding:14px 16px}
+
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .row+.row{margin-top:10px}
+    input[type="file"]{display:block;width:100%}
+    .btn{appearance:none;border:1px solid #2a3144;background:#202638;color:var(--text);padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:600}
+    .btn:hover{filter:brightness(1.08)}
+    .btn:active{transform:translateY(1px)}
+    .btn.brand{background:var(--brand);border-color:#cc6300;color:#000}
+    .btn.ok{background:var(--ok);border-color:#16a34a;color:#00140a}
+    .btn.warn{background:var(--warn);border-color:#b45309;color:#1a1203}
+    .btn.ghost{background:transparent}
+    .btn.small{padding:6px 10px;font-size:12px}
+    .btn.icon{display:inline-flex;gap:8px;align-items:center}
+    .btn.danger{background:#2a1a1a;border-color:#6b1d1d;color:#ffdada}
+
+    .preview{display:grid;grid-template-rows:auto 1fr}
+    .preview .stage{padding:12px}
+    .stage .imgbox{background:var(--surface);border:1px solid #222838;border-radius:12px;display:grid;place-items:center;min-height:420px;overflow:auto}
+    .stage img{max-width:100%;height:auto;display:block}
+
+    .steps{padding:0;margin:0;list-style:none}
+    .steps li{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-top:1px solid #222838}
+    .steps li:first-child{border-top:none}
+    .steps .meta{display:flex;gap:10px;align-items:center}
+    .pill{font-size:12px;padding:2px 8px;border-radius:999px;background:#232a3b;color:#c7d2fe;border:1px solid #2a3144}
+    .label{font-weight:600}
+    .ops{display:flex;gap:6px}
+
+    .tools{display:grid;grid-template-columns:repeat(2, minmax(0,1fr));gap:10px}
+    .tool{padding:10px 12px;background:#1a2030;border:1px solid #222838;border-radius:10px;cursor:pointer;text-align:left;color:#fff}
+    .tool:hover{box-shadow:var(--ring)}
+
+    dialog{border:none;border-radius:16px;padding:0;background:#0f1420;color:var(--text);width:min(900px,95vw)}
+    dialog::backdrop{background:rgba(0,0,0,.55)}
+    .modal-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid #1e2535}
+    .modal-body{padding:16px}
+    .modal-foot{padding:12px 16px;border-top:1px solid #1e2535;display:flex;gap:10px;justify-content:flex-end}
+
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    label{display:block;font-size:12px;color:#b9c1d3;margin-bottom:6px}
+    input[type="text"], input[type="number"], select{width:100%;padding:10px 12px;border-radius:10px;background:#12182a;border:1px solid #273049;color:var(--text)}
+    input[type="checkbox"]{transform:scale(1.1)}
+    input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button{opacity:1}
+    .help{font-size:12px;color:#9aa4b8;margin-top:4px}
+
+    .logs{background:#0c1020;border:1px solid #202744;border-radius:12px;padding:10px;max-height:260px;overflow:auto;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:12px;white-space:pre-wrap}
+
+    .spinner{width:16px;height:16px;border:3px solid #ffffff20;border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .inline{display:inline-flex;gap:8px;align-items:center}
+
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;place-items:center;z-index:1000}
+    .overlay .box{width:min(900px,95vw);background:#0f1420;border:1px solid #1e2535;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+    .overlay .box .head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid #1e2535}
+    .overlay .box .body{padding:16px}
+
+    /* Tabela de presets */
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:10px;border-bottom:1px solid #222838;text-align:left;vertical-align:middle}
+    th{color:#cbd5e1;font-weight:600}
+    tr:hover td{background:#121622}
+    .badge{display:inline-block;padding:2px 8px;border-radius:999px;border:1px solid #2a3144;background:#232a3b;font-size:12px}
+    .badge.ok{background:#173621;border-color:#1f6b3a;color:#93f2b4}
+    .muted{color:#9aa4b8}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>PS Macro Tuner <span class="tag">Admin — Sessões & Presets</span></h1>
+
+    <div class="grid">
+      <!-- Coluna esquerda: sessão e ferramentas -->
+      <div class="card">
+        <h2>Imagem & Ferramentas</h2>
+        <div class="section">
+          <div class="row">
+            <input id="file" type="file" accept="image/*" />
+            <button class="btn brand" id="btnStart">Iniciar sessão</button>
+          </div>
+          <div class="help">Carregue a imagem base e clique em <b>Iniciar sessão</b>. Depois adicione os passos (na ordem que desejar). Cada passo gera um preview e logs.</div>
+        </div>
+
+        <div class="section">
+          <div class="row" style="justify-content:space-between">
+            <strong>Ferramentas</strong>
+            <button class="btn small" id="btnSeq12">Carregar sequência padrão (12 passos)</button>
+          </div>
+          <div class="tools" id="tools">
+            <button class="tool" data-op="bw">01 — Preto & Branco (BW)</button>
+            <button class="tool" data-op="bc">Brilho/Contraste</button>
+            <button class="tool" data-op="shadows">Sombras (int, largura, raio)</button>
+            <button class="tool" data-op="highlights">Realces (int, largura, raio)</button>
+            <button class="tool" data-op="exposure">Exposição (EV, Offset, Gamma)</button>
+            <button class="tool" data-op="levelsOut">Níveis de Saída (lo, hi)</button>
+            <button class="tool" data-op="normalize">Normalize (clips)</button>
+            <button class="tool" data-op="denoise">Denoise</button>
+            <button class="tool" data-op="sharpen">Sharpen</button>
+            <button class="tool" data-op="aiEnhance">AI Enhance (2×)</button>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="row">
+            <button class="btn" id="btnExport">Exportar PNG</button>
+            <button class="btn ok" id="btnPreset">Salvar como Preset</button>
+            <span id="meta"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Coluna direita: preview e passos -->
+      <div class="card preview">
+        <h2>Preview</h2>
+        <div class="stage">
+          <div class="imgbox">
+            <img id="preview" alt="preview" />
+          </div>
+        </div>
+        <div class="section">
+          <h3 style="margin:0 0 8px">Passos</h3>
+          <ul class="steps" id="steps"></ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Linha inteira: gestão de presets -->
+    <div class="card" style="margin-top:20px;">
+      <h2>Presets (Admin)</h2>
+      <div class="section">
+        <div class="row" style="justify-content:space-between;align-items:center">
+          <div class="muted">Gerencie seus presets publicados e privados.</div>
+          <button class="btn" id="btnRefreshPresets">Recarregar lista</button>
+        </div>
+        <div style="margin-top:12px;overflow:auto">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:28%">Nome</th>
+                <th style="width:26%">Slug</th>
+                <th style="width:12%">Status</th>
+                <th style="width:16%">Atualizado</th>
+                <th style="width:18%">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="presetsTbody">
+              <tr><td colspan="5" class="muted">Nenhum preset carregado.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Passo -->
+  <dialog id="dlgStep">
+    <form method="dialog">
+      <div class="modal-head">
+        <div class="inline"><strong id="dlgTitle">Adicionar passo</strong></div>
+        <button class="btn small ghost" onclick="dlgStep.close();return false;">Fechar</button>
+      </div>
+      <div class="modal-body">
+        <div class="grid2">
+          <div>
+            <label>Operação</label>
+            <select id="op">
+              <option value="bw">bw</option>
+              <option value="bc">bc</option>
+              <option value="shadows">shadows</option>
+              <option value="highlights">highlights</option>
+              <option value="exposure">exposure</option>
+              <option value="levelsOut">levelsOut</option>
+              <option value="normalize">normalize</option>
+              <option value="denoise">denoise</option>
+              <option value="sharpen">sharpen</option>
+              <option value="aiEnhance">aiEnhance</option>
+            </select>
+            <div class="help">Você pode nomear o passo no campo ao lado (rótulo). </div>
+          </div>
+          <div>
+            <label>Rótulo do passo</label>
+            <input id="label" type="text" placeholder="Ex.: 01 - Preto e Branco" />
+          </div>
+        </div>
+        <div id="paramFields" style="margin-top:12px"></div>
+
+        <div style="margin-top:14px">
+          <label>Logs do servidor</label>
+          <div class="logs" id="logs">(vazio)</div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn" value="cancel">Cancelar</button>
+        <button class="btn brand" id="btnApplyStep">Aplicar passo</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Modal de Preset (criar/editar) -->
+  <dialog id="dlgPreset">
+    <form method="dialog">
+      <div class="modal-head">
+        <strong id="dlgPresetTitle">Salvar Preset</strong>
+        <button class="btn small ghost" onclick="dlgPreset.close();return false;">Fechar</button>
+      </div>
+      <div class="modal-body">
+        <div class="grid2">
+          <div>
+            <label>Nome do preset</label>
+            <input id="presetName" type="text" placeholder="Ex.: macro_12_passos_v1" />
+            <div class="help">Aparece na lista (admin e público).</div>
+          </div>
+          <div>
+            <label>Slug público</label>
+            <input id="presetSlug" type="text" placeholder="macro-12-passos-v1" />
+            <div class="help">a-z, 0-9 e hífen (auto do nome; você pode editar).</div>
+          </div>
+        </div>
+        <div class="row" style="margin-top:10px">
+          <label class="inline" title="Disponibiliza em /public/presets (seu app do usuário final).">
+            <input id="presetPublish" type="checkbox" checked />
+            <span>Publicar imediatamente</span>
+          </label>
+          <label class="inline" title="Ao criar: substitui slug existente. Ao editar: mantém o mesmo id.">
+            <input id="presetAllowOverwrite" type="checkbox" />
+            <span>Allow overwrite</span>
+          </label>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn" value="cancel">Cancelar</button>
+        <button class="btn ok" id="btnSavePreset">Salvar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Modal Editar Preset (atalho – reusa o mesmo dlgPreset com modo edição) -->
+
+  <!-- Overlay de processamento -->
+  <div class="overlay" id="overlay">
+    <div class="box">
+      <div class="head">
+        <div class="inline">
+          <div class="spinner"></div>
+          <strong>Processando…</strong>
+        </div>
+        <button class="btn small ghost" id="btnCloseOverlay" type="button">Fechar</button>
+      </div>
+      <div class="body">
+        <div class="logs" id="overlayLogs">(aguardando resposta do servidor…)</div>
+      </div>
+    </div>
+  </div>
+
+    <script>
+    // ===================== CONFIG =====================
+    const API_BASE = localStorage.getItem('ps_api_base') || 'http://localhost:3000';
+    const ENDPOINTS = {
+        listPresets: () => `${API_BASE}/presets`,
+        listPublicPresets: () => `${API_BASE}/public/presets`,
+        updatePreset: (id) => `${API_BASE}/presets/${id}`,   // backend ainda não implementado
+        deletePreset: (id) => `${API_BASE}/presets/${id}`,   // backend ainda não implementado
+        startSession: () => `${API_BASE}/sessions?accept=json`,
+        addStep: (sid) => `${API_BASE}/sessions/${sid}/steps?accept=json`,
+        updateStep: (sid, i) => `${API_BASE}/sessions/${sid}/steps/${i}?accept=json`,
+        deleteStep: (sid, i) => `${API_BASE}/sessions/${sid}/steps/${i}?accept=json`,
+        exportImage: (sid) => `${API_BASE}/sessions/${sid}/export?out=png&accept=json`,
+        savePresetFromSession: (sid) => `${API_BASE}/sessions/${sid}/savePreset`,
+    };
+
+    // ===================== ESTADO =====================
+    let SID = null;
+    let CURRENT_STEPS = [];
+    let EDITING_PRESET_ID = null; // null = criar; string = editar aquele id
+
+    // Sequência padrão (12 passos)
+    const DEFAULT_SEQUENCE = [
+        { op:'bw',        label:'01 - Preto e Branco',                      params:{ r:92, y:94, g:40, c:60, b:34, m:80 } },
+        { op:'bc',        label:'02 - B/C (15,0)',                          params:{ b:15, c:0 } },
+        { op:'shadows',   label:'03 - Sombras (20,50,30)',                  params:{ intensity:20, width:50, radius:30 } },
+        { op:'highlights',label:'03b - Realces (15,50,30)',                 params:{ intensity:15, width:50, radius:30 } },
+        { op:'exposure',  label:'04 - Exposição (EV=-0.38,Off=0.0041,γ=0.95)', params:{ ev:-0.38, offset:0.0041, gamma:0.95 } },
+        { op:'bc',        label:'05 - B/C (10,5)',                          params:{ b:10, c:5 } },
+        { op:'levelsOut', label:'06 - Níveis (15,240)',                     params:{ lo:15, hi:240 } },
+        { op:'bc',        label:'07 - B/C (10,5)',                          params:{ b:10, c:5 } },
+        { op:'shadows',   label:'08 - Sombras (45,50,30)',                  params:{ intensity:45, width:50, radius:30 } },
+        { op:'highlights',label:'08b - Realces (5,50,30)',                  params:{ intensity:5, width:50, radius:30 } },
+        { op:'levelsOut', label:'09 - Níveis (15,240)',                     params:{ lo:15, hi:240 } },
+        { op:'bc',        label:'10 - B/C (0,25)',                          params:{ b:0,  c:25 } },
+        { op:'levelsOut', label:'11 - Níveis (25,255)',                     params:{ lo:25, hi:255 } },
+        { op:'bc',        label:'12 - B/C (-5,30)',                         params:{ b:-5, c:30 } },
+    ];
+
+    // ===================== SHORTCUTS =====================
+    const el = id => document.getElementById(id);
+    const file = el('file');
+    const btnStart = el('btnStart');
+    const btnExport = el('btnExport');
+    const btnPreset = el('btnPreset');
+    const btnRefreshPresets = el('btnRefreshPresets');
+    const preview = el('preview');
+    const meta = el('meta');
+    const stepsUl = el('steps');
+    const dlgStep = el('dlgStep');
+    const dlgPreset = el('dlgPreset');
+    const overlay = el('overlay');
+    const overlayLogs = el('overlayLogs');
+    const inpPresetName = el('presetName');
+    const inpPresetSlug = el('presetSlug');
+    const chkPresetPublish = el('presetPublish');
+    const chkPresetAllowOverwrite = el('presetAllowOverwrite');
+    const dlgPresetTitle = el('dlgPresetTitle');
+    const presetsTbody = el('presetsTbody');
+
+    // ===================== HELPERS UI =====================
+    function showOverlay(msg='Processando…'){ overlay.style.display='grid'; overlayLogs.textContent = msg; }
+    function hideOverlay(){ overlay.style.display='none'; }
+    function fmtDate(x){
+        try { const d = new Date(x); return d.toLocaleString(); } catch { return String(x||''); }
+    }
+    function slugify(s){
+        return String(s||'')
+        .normalize('NFKD').replace(/[\u0300-\u036f]/g,'')
+        .toLowerCase().replace(/[^a-z0-9]+/g,'-')
+        .replace(/^-+|-+$/g,'').slice(0,64);
+    }
+
+    // ===================== PARAM SCHEMAS =====================
+    const paramSchemas = {
+        bw: [
+        {key:'r', label:'R', type:'number', min:0, max:200, step:1, value:100},
+        {key:'y', label:'Y', type:'number', min:0, max:200, step:1, value:60},
+        {key:'g', label:'G', type:'number', min:0, max:200, step:1, value:40},
+        {key:'c', label:'C', type:'number', min:0, max:200, step:1, value:20},
+        {key:'b', label:'B', type:'number', min:0, max:200, step:1, value:20},
+        {key:'m', label:'M', type:'number', min:0, max:200, step:1, value:80},
+        ],
+        bc: [
+        {key:'b', label:'Brilho (−150..150)', type:'number', min:-150, max:150, step:1, value:0},
+        {key:'c', label:'Contraste (−150..150)', type:'number', min:-150, max:150, step:1, value:20},
+        ],
+        shadows: [
+        {key:'intensity', label:'Intensidade', type:'number', min:0, max:100, step:1, value:50},
+        {key:'width', label:'Largura', type:'number', min:1, max:100, step:1, value:50},
+        {key:'radius', label:'Raio', type:'number', min:1, max:200, step:1, value:30},
+        ],
+        highlights: [
+        {key:'intensity', label:'Intensidade', type:'number', min:0, max:100, step:1, value:10},
+        {key:'width', label:'Largura', type:'number', min:1, max:100, step:1, value:50},
+        {key:'radius', label:'Raio', type:'number', min:1, max:200, step:1, value:30},
+        ],
+        exposure: [
+        {key:'ev', label:'EV', type:'number', min:-4, max:4, step:0.01, value:0},
+        {key:'offset', label:'Offset (−0.2..0.2)', type:'number', min:-0.2, max:0.2, step:0.0001, value:0},
+        {key:'gamma', label:'Gamma (0.1..3)', type:'number', min:0.1, max:3, step:0.01, value:1},
+        ],
+        levelsOut: [
+        {key:'lo', label:'Low (0..255)', type:'number', min:0, max:255, step:1, value:15},
+        {key:'hi', label:'High (0..255)', type:'number', min:0, max:255, step:1, value:240},
+        ],
+        normalize: [
+        {key:'black', label:'Clipping preto (0..100)', type:'number', min:0, max:100, step:1, value:2},
+        {key:'white', label:'Clipping branco (0..100)', type:'number', min:0, max:100, step:1, value:2},
+        ],
+        denoise: [ {key:'level', label:'Nível (0..10)', type:'number', min:0, max:10, step:1, value:1} ],
+        sharpen: [ {key:'amount', label:'Força (0..5)', type:'number', min:0, max:5, step:1, value:2 } ],
+        aiEnhance: []
+    };
+
+    // ===================== SESSÃO (imagem) =====================
+    async function startSession(){
+        const f=file.files?.[0];
+        if(!f){ alert('Selecione uma imagem.'); return; }
+        const fd=new FormData(); fd.append('file', f);
+        showOverlay('Enviando imagem e criando sessão…');
+        const r=await fetch(ENDPOINTS.startSession(), { method:'POST', body:fd });
+        const j=await r.json();
+        overlayLogs.textContent = j.log || '(sem logs)';
+        if(!r.ok){ alert(j.error||'Falha'); hideOverlay(); return; }
+        SID=j.sid; CURRENT_STEPS=[];
+        preview.src=j.preview; meta.textContent=`${j.meta.width}×${j.meta.height} • ${j.meta.format.toUpperCase()}`;
+        drawSteps();
+        hideOverlay();
+    }
+
+    function renderParamFields(op){
+        const box = document.getElementById('paramFields');
+        const schema = paramSchemas[op]||[];
+        box.innerHTML = '';
+        if(!schema.length){
+        box.innerHTML = '<div class="help">Sem parâmetros para esta operação.</div>';
+        return;
+        }
+        const g = document.createElement('div');
+        g.className='grid2';
+        schema.forEach(f=>{
+        const w = document.createElement('div');
+        w.innerHTML = `<label>${f.label}</label>
+            <input data-key="${f.key}" type="${f.type}" min="${f.min}" max="${f.max}" step="${f.step}" value="${f.value}">`;
+        g.appendChild(w);
+        });
+        box.appendChild(g);
+    }
+
+    function buildLabelFromCurrent(op){
+        const schema = paramSchemas[op]||[];
+        if(!schema.length) { return (op==='aiEnhance' ? 'Aprimoramento por IA (2×)' : op); }
+        const vals = schema.map(f => {
+        const node = document.querySelector(`[data-key="${f.key}"]`);
+        return node ? Number(node.value) : f.value;
+        });
+        switch(op){
+        case 'bw':        return 'Preto e Branco';
+        case 'bc':        return `Brilho e Contraste (${vals[0]}, ${vals[1]})`;
+        case 'shadows':   return `Sombras (${vals[0]}, ${vals[1]}, ${vals[2]})`;
+        case 'highlights':return `Realces (${vals[0]}, ${vals[1]}, ${vals[2]})`;
+        case 'exposure':  return `Exposição (EV=${vals[0]}, Offset=${vals[1]}, Gamma=${vals[2]})`;
+        case 'levelsOut': return `Níveis de Saída (Low=${vals[0]}, High=${vals[1]})`;
+        case 'normalize': return `Normalização (Preto=${vals[0]}, Branco=${vals[1]})`;
+        case 'denoise':   return `Redução de Ruído (Nível=${vals[0]})`;
+        case 'sharpen':   return `Nitidez (Força=${vals[0]})`;
+        case 'aiEnhance': return 'Aprimoramento por IA (2×)';
+        default:          return op;
+        }
+    }
+
+    function collectParams(op){
+        const schema=paramSchemas[op]||[]; const params={};
+        schema.forEach(f=>{
+        const node = document.querySelector(`[data-key="${f.key}"]`);
+        params[f.key]= node ? Number(node.value) : f.value;
+        });
+        return params;
+    }
+
+    function drawSteps(){
+        stepsUl.innerHTML='';
+        CURRENT_STEPS.forEach((s,idx)=>{
+        const li=document.createElement('li');
+        const left=document.createElement('div');
+        left.className='meta';
+        const pill=document.createElement('span'); pill.className='pill'; pill.textContent=s.op;
+        const lab=document.createElement('span'); lab.className='label'; lab.textContent=s.label||`Passo ${idx+1}`;
+        left.append(pill,lab);
+        const right=document.createElement('div'); right.className='ops';
+        const bEdit=document.createElement('button'); bEdit.className='btn small ghost'; bEdit.textContent='Editar';
+        const bDel=document.createElement('button'); bDel.className='btn small ghost'; bDel.textContent='Remover';
+        bEdit.onclick=()=>openEdit(idx);
+        bDel.onclick=()=>delStep(idx);
+        right.append(bEdit,bDel);
+        li.append(left,right); stepsUl.append(li);
+        });
+    }
+
+    async function applyStep(){
+        if(!SID){ alert('Crie a sessão primeiro.'); return; }
+        const op=document.getElementById('op').value; const label=document.getElementById('label').value.trim();
+        const params = paramSchemas[op]?.length ? collectParams(op) : (op==='aiEnhance'?{enabled:true}:{});
+        showOverlay('Aplicando passo…');
+        const r=await fetch(ENDPOINTS.addStep(SID),{
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({ op, params })
+        });
+        const j=await r.json();
+        overlayLogs.textContent = j.log || '(sem logs)';
+        if(!r.ok){ alert(j.error||'Falha'); hideOverlay(); return; }
+        preview.src=j.preview; meta.textContent=`${j.meta.width}×${j.meta.height} • ${j.meta.format.toUpperCase()}`;
+        CURRENT_STEPS = j.steps.map((s,i)=>({ ...s, label: (i===j.stepIndex && label)? label : (CURRENT_STEPS[i]?.label||'') }));
+        drawSteps();
+        hideOverlay();
+        dlgStep.close();
+    }
+
+    async function delStep(idx){
+        if(!SID) return;
+        showOverlay('Removendo passo…');
+        const r=await fetch(ENDPOINTS.deleteStep(SID, idx),{ method:'DELETE' });
+        const j=await r.json();
+        overlayLogs.textContent = j.log || '(sem logs)';
+        if(!r.ok){ alert(j.error||'Falha'); hideOverlay(); return; }
+        CURRENT_STEPS = j.steps.map((s,i)=>({ ...s, label: (CURRENT_STEPS[i]?.label || CURRENT_STEPS[i+1]?.label || '') }));
+        preview.src=j.preview; meta.textContent=`${j.meta.width}×${j.meta.height} • ${j.meta.format.toUpperCase()}`;
+        drawSteps();
+        hideOverlay();
+    }
+
+    function openAdd(op){
+        document.getElementById('op').value=op;
+        renderParamFields(op);
+        document.getElementById('logs').textContent='(vazio)';
+        document.getElementById('label').value = buildLabelFromCurrent(op);
+        dlgStep.removeAttribute('data-edit-idx');
+        dlgStep.showModal();
+    }
+
+    function openEdit(idx){
+        const s = CURRENT_STEPS[idx]; if(!s) return;
+        document.getElementById('op').value=s.op; renderParamFields(s.op);
+        document.getElementById('label').value=s.label||'';
+        document.getElementById('logs').textContent='(vazio)';
+        const schema=paramSchemas[s.op]||[]; schema.forEach(f=>{
+        const inp = document.querySelector(`[data-key="${f.key}"]`);
+        if(inp) inp.value = (s.params?.[f.key] ?? f.value);
+        });
+        dlgStep.setAttribute('data-edit-idx', String(idx));
+        dlgStep.showModal();
+    }
+
+    async function saveEditedStep(){
+        const idxAttr = dlgStep.getAttribute('data-edit-idx');
+        if(!SID || idxAttr===null) { await applyStep(); return; }
+        const idx = Number(idxAttr);
+        const op = document.getElementById('op').value; const label = document.getElementById('label').value.trim();
+        const params = paramSchemas[op]?.length ? collectParams(op) : (op==='aiEnhance'?{enabled:true}:{});
+        showOverlay('Atualizando passo…');
+        const r=await fetch(ENDPOINTS.updateStep(SID, idx),{
+        method:'PUT', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({ op, params })
+        });
+        const j=await r.json();
+        overlayLogs.textContent = j.log || '(sem logs)';
+        if(!r.ok){ alert(j.error||'Falha'); hideOverlay(); return; }
+        preview.src=j.preview; meta.textContent=`${j.meta.width}×${j.meta.height} • ${j.meta.format.toUpperCase()}`;
+        CURRENT_STEPS = j.steps.map((s,i)=>({ ...s, label: (i===idx ? (label||CURRENT_STEPS[i]?.label||'') : (CURRENT_STEPS[i]?.label||'')) }));
+        drawSteps();
+        hideOverlay();
+        dlgStep.close();
+    }
+
+    async function exportImage(){
+        if(!SID){ alert('Crie a sessão primeiro.'); return; }
+        showOverlay('Gerando export final…');
+        const r=await fetch(ENDPOINTS.exportImage(SID),{ method:'POST' });
+        const j=await r.json();
+        overlayLogs.textContent = j.log || '(sem logs)';
+        if(!r.ok){ alert(j.error||'Falha'); hideOverlay(); return; }
+        const a=document.createElement('a'); a.href=j.image; a.download='out.png'; a.click();
+        hideOverlay();
+    }
+
+    // ===================== PRESETS (criar/editar/excluir/listar) =====================
+    function openPresetCreate(){
+        EDITING_PRESET_ID = null;
+        document.getElementById('dlgPresetTitle').textContent = 'Salvar Preset';
+        inpPresetName.value = '';
+        inpPresetSlug.value = '';
+        chkPresetPublish.checked = true;
+        chkPresetAllowOverwrite.checked = false;
+        dlgPreset.showModal();
+    }
+
+    function openPresetEdit(p){
+        EDITING_PRESET_ID = p.id;
+        document.getElementById('dlgPresetTitle').textContent = 'Editar Preset';
+        inpPresetName.value = p.name || '';
+        inpPresetSlug.value = p.slug || '';
+        chkPresetPublish.checked = !!p.published;
+        chkPresetAllowOverwrite.checked = false; // não impacta PUT
+        dlgPreset.showModal();
+    }
+
+    async function savePreset(){
+        const name = inpPresetName.value.trim(); if(!name){ alert('Dê um nome.'); return; }
+        const publish = chkPresetPublish.checked;
+        let slug = inpPresetSlug.value.trim();
+        if (publish) {
+        if (!slug) slug = slugify(name);
+        if (!/^[a-z0-9-]{3,64}$/.test(slug)) {
+            alert('Slug inválido. Use letras minúsculas, números e hífen (3–64).');
+            return;
+        }
+        }
+
+        showOverlay(EDITING_PRESET_ID ? 'Atualizando preset…' : 'Salvando preset…');
+
+        if (EDITING_PRESET_ID) {
+        // PUT /presets/:id (ainda não suportado no backend atual)
+        const r = await fetch(ENDPOINTS.updatePreset(EDITING_PRESET_ID), {
+            method:'PUT', headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({ name, slug, published: publish })
+        });
+        const j = await r.json().catch(()=>({}));
+        overlayLogs.textContent = (j && (j.log||j.message)) || '(ok)';
+        hideOverlay();
+        if (r.status === 404) { alert('Atualização não suportada no backend atual (PUT /presets/:id ausente).'); return; }
+        if(!r.ok){ alert(j?.error || j?.message || 'Falha ao atualizar'); return; }
+        dlgPreset.close();
+        await loadPresets();
+        alert('Preset atualizado com sucesso.');
+        } else {
+        // POST /sessions/:sid/savePreset
+        const allowOverwrite = chkPresetAllowOverwrite.checked;
+        if(!SID){ hideOverlay(); alert('Crie uma sessão antes de salvar preset.'); return; }
+        const payload = { name, publish, slug, allowOverwrite };
+        const r=await fetch(ENDPOINTS.savePresetFromSession(SID), {
+            method:'POST', headers:{'Content-Type':'application/json'},
+            body:JSON.stringify(payload)
+        });
+        const j=await r.json();
+        overlayLogs.textContent = j.log || '(preset salvo)';
+        hideOverlay();
+        if(!r.ok){ alert(j.error||'Falha'); return; }
+        dlgPreset.close();
+        await loadPresets();
+        let msg = `Preset salvo: ${j.name} (id: ${j.presetId})`;
+        if (j.published?.slug) msg += `\nPublicado como: ${j.published.slug}`;
+        alert(msg);
+        }
+    }
+
+    async function deletePreset(id){
+        if(!confirm('Tem certeza que deseja excluir este preset? Esta ação não pode ser desfeita.')) return;
+        showOverlay('Excluindo preset…');
+        const r = await fetch(ENDPOINTS.deletePreset(id), { method:'DELETE' });
+        const j = await r.json().catch(()=>({}));
+        overlayLogs.textContent = (j && (j.log||j.message)) || '(ok)';
+        hideOverlay();
+        if (r.status === 404) { alert('Exclusão não suportada no backend atual (DELETE /presets/:id ausente).'); return; }
+        if(!r.ok){ alert(j?.error || j?.message || 'Falha ao excluir'); return; }
+        await loadPresets();
+        alert('Preset excluído.');
+    }
+
+    // Lista presets (admin) + cruza com os públicos para exibir slug/status
+    async function loadPresets(){
+        presetsTbody.innerHTML = `<tr><td colspan="5" class="muted">Carregando…</td></tr>`;
+        try{
+        // 1) Admin
+        const rAdmin = await fetch(ENDPOINTS.listPresets());
+        if (!rAdmin.ok) throw new Error(`HTTP ${rAdmin.status} em /presets`);
+        const jAdmin = await rAdmin.json();
+        const items = Array.isArray(jAdmin) ? jAdmin : (jAdmin?.presets || []);
+
+        // 2) Públicos (opcional)
+        let pubMap = new Map(); // presetId -> {slug, updatedAt}
+        try{
+            const rPub = await fetch(ENDPOINTS.listPublicPresets());
+            if (rPub.ok){
+            const jPub = await rPub.json();
+            const pubs = Array.isArray(jPub) ? jPub : (jPub?.presets || []);
+            pubs.forEach(p => { if (p.presetId) pubMap.set(p.presetId, { slug: p.slug, updatedAt: p.updatedAt }); });
+            }
+        }catch{}
+
+        if(!items.length){
+            presetsTbody.innerHTML = `<tr><td colspan="5" class="muted">Nenhum preset encontrado.</td></tr>`;
+            return;
+        }
+
+        // ordena por updatedAt desc (admin)
+        items.sort((a,b)=> new Date(b.updatedAt||0) - new Date(a.updatedAt||0));
+
+        presetsTbody.innerHTML = '';
+        items.forEach(p=>{
+            const tr = document.createElement('tr');
+
+            // Nome
+            const tdName = document.createElement('td');
+            tdName.textContent = p.name || '(sem nome)';
+
+            // Slug: só existe se estiver publicado (vem do /public/presets)
+            const pubInfo = pubMap.get(p.id);
+            const tdSlug = document.createElement('td');
+            tdSlug.textContent = pubInfo?.slug || '—';
+
+            // Published badge
+            const tdPub = document.createElement('td');
+            tdPub.innerHTML = pubInfo?.slug ? `<span class="badge ok">publicado</span>` : `<span class="badge">privado</span>`;
+
+            // Updated (admin) ou (público) — prioriza admin updatedAt
+            const tdUpd = document.createElement('td');
+            const upd = p.updatedAt || pubInfo?.updatedAt;
+            tdUpd.textContent = upd ? fmtDate(upd) : '—';
+
+            // Ações
+            const tdAct = document.createElement('td');
+            const bEdit = document.createElement('button'); bEdit.className='btn small'; bEdit.textContent='Editar';
+            const bDel = document.createElement('button'); bDel.className='btn small danger'; bDel.style.marginLeft='8px'; bDel.textContent='Excluir';
+            bEdit.onclick = ()=> openPresetEdit({ ...p, slug: pubInfo?.slug, published: !!pubInfo?.slug });
+            bDel.onclick = ()=> deletePreset(p.id);
+            tdAct.append(bEdit, bDel);
+
+            tr.append(tdName, tdSlug, tdPub, tdUpd, tdAct);
+            presetsTbody.append(tr);
+        });
+        }catch(err){
+        presetsTbody.innerHTML = `<tr><td colspan="5" class="muted">Erro ao carregar: ${err?.message||err}</td></tr>`;
+        }
+    }
+
+    // ===================== SEQ PADRÃO =====================
+    async function applyDefaultSequence(){
+        if(!SID){ alert('Crie a sessão primeiro.'); return; }
+        if(!confirm('Aplicar a sequência padrão (12 passos)?')) return;
+
+        for(let i=0;i<DEFAULT_SEQUENCE.length;i++){
+        const s = DEFAULT_SEQUENCE[i];
+        showOverlay(`Aplicando: ${s.label}…`);
+        const r=await fetch(ENDPOINTS.addStep(SID),{
+            method:'POST', headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({ op:s.op, params:s.params })
+        });
+        const j=await r.json();
+        overlayLogs.textContent = j.log || '(sem logs)';
+        if(!r.ok){ alert(j.error||('Falha em '+s.label)); hideOverlay(); break; }
+        CURRENT_STEPS = j.steps.map((st,idx)=>({
+            ...st,
+            label: (idx <= i ? (CURRENT_STEPS[idx]?.label || DEFAULT_SEQUENCE[idx]?.label || '') : (CURRENT_STEPS[idx]?.label || ''))
+        }));
+        preview.src=j.preview; meta.textContent=`${j.meta.width}×${j.meta.height} • ${j.meta.format.toUpperCase()}`;
+        drawSteps();
+        }
+        hideOverlay();
+        alert('Sequência concluída.');
+    }
+
+    // ===================== WIRE-UP EVENTS =====================
+    btnStart.onclick = startSession;
+    btnExport.onclick = exportImage;
+    btnPreset.onclick = openPresetCreate;
+    el('btnSavePreset').onclick = (e)=>{ e.preventDefault(); savePreset(); };
+    el('btnCloseOverlay').onclick = hideOverlay;
+    btnRefreshPresets.onclick = loadPresets;
+
+    document.querySelectorAll('.tool').forEach(btn=>{
+        btn.addEventListener('click',()=> openAdd(btn.dataset.op));
+    });
+
+    document.getElementById('op').addEventListener('change', e=>{
+        renderParamFields(e.target.value);
+        document.getElementById('label').value = buildLabelFromCurrent(e.target.value);
+    });
+
+    document.getElementById('btnApplyStep').onclick = (e)=>{ e.preventDefault(); saveEditedStep(); };
+    document.getElementById('btnSeq12').onclick = applyDefaultSequence;
+
+    // Slug auto do nome (só quando criando/convertendo)
+    inpPresetName.addEventListener('input', ()=>{
+        if (!EDITING_PRESET_ID) { // modo criar
+        if (!inpPresetSlug.value || inpPresetSlug.value === slugify(inpPresetSlug.value)) {
+            inpPresetSlug.value = slugify(inpPresetName.value);
+            }
+        }
+    });
+
+    // Estado inicial
+    (function init(){ renderParamFields('bw'); loadPresets(); })();
+    </script>
+
+</body>
+</html>
