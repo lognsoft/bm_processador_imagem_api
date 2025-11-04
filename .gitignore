@@ -1,60 +1,8 @@
-# Dependências
-node_modules/
-
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-
-# Cache
-.cache/
-.temp/
-.tmp/
-dist/
-build/
-coverage/
-
-# Ambiente
+node_modules
+dist
 .env
-.env.local
-.env.*.local
-
-# Sistema operacional
-.DS_Store
-Thumbs.db
-
-# Editor / IDE
-.vscode/
-.idea/
-*.swp
-
-# Ferramentas de build/bundlers
-.next/
-.nuxt/
-.svelte-kit/
-out/
-storybook-static/
-
-# Testes
-.jest/
-*.tsbuildinfo
-
-# Docker
-docker-data/
-
-# TypeScript
-*.d.ts
-tsconfig.tsbuildinfo
-
-# Firebase / GCP
-.firebase/
-.firebaserc
-
-# PM2
-.pids
-*.pid
-*.seed
-*.pid.lock
+data/*.png
+data/*.jpg
+data/*.webp
+data/*.avif
+data/*.tif
