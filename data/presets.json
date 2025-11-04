@@ -1,17 +1,3 @@
 {
-  "presets": {
-    "4ea6106ca019": {
-      "name": "adsf",
-      "steps": [
-        {
-          "op": "aiEnhance",
-          "params": {
-            "enabled": true
-          }
-        }
-      ],
-      "createdAt": "2025-11-04T16:00:27.347Z",
-      "updatedAt": "2025-11-04T16:04:36.493Z"
-    }
-  }
+  "presets": {}
 }

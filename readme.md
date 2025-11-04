@@ -2,6 +2,8 @@ npm i
 npm run dev     # desenvolvimento com tsx
 # ou
 npm run build && npm start
+# ou
+npm start
 
 ps-macro-api/
 ├─ package.json

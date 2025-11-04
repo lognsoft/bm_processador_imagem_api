@@ -34,13 +34,13 @@ export function mkLogger(reqId: string): MkLogger {
 
   const step = async <T>(label: string, fn: () => Promise<T>): Promise<T> => {
     const t0 = nowNs();
-    push('info', `▶ ${label}...`);
+    push('info', ` ${label}...`);
     try {
       const r = await fn();
-      push('info', `✔ ${label} (${elapsedMs(t0).toFixed(1)} ms)`);
+      push('info', ` ${label} (${elapsedMs(t0).toFixed(1)} ms)`);
       return r;
     } catch (e: any) {
-      push('error', `✖ ${label} FAILED (${elapsedMs(t0).toFixed(1)} ms) :: ${e?.message || e}`);
+      push('error', ` ${label} FAILED (${elapsedMs(t0).toFixed(1)} ms) :: ${e?.message || e}`);
       throw e;
     }
   };
