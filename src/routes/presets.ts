@@ -1,14 +1,16 @@
-//presets.ts
-/**
- * Rotas administrativas de presets: listar, renomear, publicar/despublicar
- * e excluir. Suporte para curadoria pelo painel administrativo.
- */
 import { Router } from 'express';
 import { listPresets, updatePresetMeta, deletePreset, publishPreset, unpublishSlug } from '../store/presetsStore.js';
 import { slugify } from '../utils/strings.js';
 
 const router = Router();
 
+// ✅ novo: lista em /presets (o HTML espera isso)
+router.get('/', (_req, res) => {
+  const all = listPresets().map(([id, p]) => ({ id, ...p }));
+  res.json({ ok:true, presets: all });
+});
+
+// (mantém /docs como alias, se quiser)
 router.get('/docs', (_req, res) => {
   const all = listPresets().map(([id, p]) => ({ id, ...p }));
   res.json({ ok:true, presets: all });

@@ -8,31 +8,93 @@ import sharp, { type Sharp } from 'sharp';
 import type { MkLogger } from '../types.js';
 import { clamp } from '../utils/strings.js';
 
+// Helper de diagnóstico: média de R/G/B e diferenças entre canais
+async function logRgbMeans(img: Sharp, log?: MkLogger, label = 'probe') {
+  const s = await img.clone().removeAlpha().toColourspace('srgb').stats();
+  const r = s.channels[0]?.mean ?? 0;
+  const g = s.channels[1]?.mean ?? 0;
+  const b = s.channels[2]?.mean ?? 0;
+  log?.info?.(`[BW] ${label} means`, {
+    r: r.toFixed(2), g: g.toFixed(2), b: b.toFixed(2)
+  });
+  const deltaRG = Math.abs(r - g);
+  const deltaRB = Math.abs(r - b);
+  const deltaGB = Math.abs(g - b);
+  log?.info?.(`[BW] ${label} deltas`, {
+    rg: deltaRG.toFixed(2), rb: deltaRB.toFixed(2), gb: deltaGB.toFixed(2)
+  });
+}
+/**
+ * Preto & Branco com mixer de canais + força (blend com neutro) + contraste.
+ * r,y,g,c,b,m em 0..200   | strength 0..100 | contrast -50..50
+ */
 export async function opBW(img: Sharp, params: any, log?: MkLogger) {
-  const bwDefaults = { r:100, y:60, g:40, c:20, b:20, m:80 };
+  const bwDefaults = { r:100, y:60, g:40, c:20, b:20, m:80, strength:70, contrast:0 };
   const bw = { ...bwDefaults, ...(params || {}) };
 
   const meta = await img.metadata();
+  log?.debug?.('[BW] meta', meta);
+
+  // separa alfa se existir
   let alphaBuf: Buffer | null = null;
   if (meta.hasAlpha) alphaBuf = await img.ensureAlpha().extractChannel('alpha').toBuffer();
 
+  // calcula pesos
   let wr = 0, wg = 0, wb = 0;
   wr += bw.r; wg += bw.g; wb += bw.b;
-  wr += (bw.y || 0) * 0.5; wg += (bw.y || 0) * 0.5;
-  wg += (bw.c || 0) * 0.5; wb += (bw.c || 0) * 0.5;
-  wr += (bw.m || 0) * 0.5; wb += (bw.m || 0) * 0.5;
+  wr += (bw.y || 0) * .5; wg += (bw.y || 0) * .5;
+  wg += (bw.c || 0) * .5; wb += (bw.c || 0) * .5;
+  wr += (bw.m || 0) * .5; wb += (bw.m || 0) * .5;
+
   const sum = wr + wg + wb || 1;
   wr /= sum; wg /= sum; wb /= sum;
-  log?.debug('  [BW] Pesos (R,G,B):', [wr.toFixed(3), wg.toFixed(3), wb.toFixed(3)]);
 
-  let base = img.toColourspace('srgb')
-    .recomb([[wr,wg,wb],[wr,wg,wb],[wr,wg,wb]])
-    .toColourspace('b-w')
-    .toColourspace('srgb');
+  const t = Math.max(0, Math.min(1, Number(bw.strength ?? 70) / 100));
+  const nr = 1/3, ng = 1/3, nb = 1/3;
+  const mr = (1 - t) * nr + t * wr;
+  const mg = (1 - t) * ng + t * wg;
+  const mb = (1 - t) * nb + t * wb;
 
-  if (alphaBuf) base = sharp(await base.toBuffer()).joinChannel(alphaBuf).toColourspace('srgb');
-  return base;
+  log?.debug?.('[BW] mix', { wr, wg, wb, t, mr, mg, mb });
+  await logRgbMeans(img, log, 'input');
+
+  // pega dados brutos da imagem
+  const { data, info } = await img.clone().removeAlpha().raw().toBuffer({ resolveWithObject: true });
+  const out = Buffer.alloc(data.length);
+
+  // aplica recombinação RGB manualmente
+  for (let i = 0; i < data.length; i += info.channels) {
+    const r = data[i];
+    const g = data[i + 1];
+    const b = data[i + 2];
+    const grayVal = mr * r + mg * g + mb * b;
+    out[i] = out[i + 1] = out[i + 2] = Math.max(0, Math.min(255, grayVal));
+  }
+
+  let gray = sharp(out, { raw: info }).toColourspace('srgb');
+
+  // aplica contraste
+  const cPct = Number(bw.contrast ?? 0);
+  if (Number.isFinite(cPct) && cPct !== 0) {
+    const a = 1 + Math.max(-0.5, Math.min(0.5, cPct / 100));
+    const b = 128 * (1 - a);
+    gray = gray.linear(a, b);
+  }
+
+  if (t >= 0.95) {
+    try { gray = gray.normalize({ lower: 2, upper: 98 }); } catch {}
+  }
+
+  await logRgbMeans(gray, log, 'after-bw');
+
+  if (alphaBuf) {
+    const buf = await gray.toBuffer();
+    gray = sharp(buf).joinChannel(alphaBuf).toColourspace('srgb');
+  }
+
+  return gray;
 }
+
 
 export function opBC(img: Sharp, params: any) {
   const brightnessPct = clamp(params?.b ?? 0, -150, 150);

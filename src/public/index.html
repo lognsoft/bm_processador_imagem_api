@@ -88,7 +88,7 @@
 </head>
 <body>
   <div class="wrap">
-    <h1>PS Macro Tuner <span class="tag">Admin — Sessões & Presets</span></h1>
+    <h1>Beyond Memories <span class="tag">Admin - Sessões & Presets</span></h1>
 
     <div class="grid">
       <!-- Coluna esquerda: sessão e ferramentas -->
@@ -349,13 +349,16 @@
     // ===================== PARAM SCHEMAS =====================
     const paramSchemas = {
         bw: [
-        {key:'r', label:'R', type:'number', min:0, max:200, step:1, value:100},
-        {key:'y', label:'Y', type:'number', min:0, max:200, step:1, value:60},
-        {key:'g', label:'G', type:'number', min:0, max:200, step:1, value:40},
-        {key:'c', label:'C', type:'number', min:0, max:200, step:1, value:20},
-        {key:'b', label:'B', type:'number', min:0, max:200, step:1, value:20},
-        {key:'m', label:'M', type:'number', min:0, max:200, step:1, value:80},
-        ],
+              {key:'r', label:'R', type:'number', min:0, max:200, step:1, value:100},
+              {key:'y', label:'Y', type:'number', min:0, max:200, step:1, value:60},
+              {key:'g', label:'G', type:'number', min:0, max:200, step:1, value:40},
+              {key:'c', label:'C', type:'number', min:0, max:200, step:1, value:20},
+              {key:'b', label:'B', type:'number', min:0, max:200, step:1, value:20},
+              {key:'m', label:'M', type:'number', min:0, max:200, step:1, value:80},
+              // novos:
+              {key:'strength', label:'Força (%)', type:'number', min:0, max:100, step:1, value:70},
+              {key:'contrast', label:'Contraste (±%)', type:'number', min:-50, max:50, step:1, value:0},
+            ],
         bc: [
         {key:'b', label:'Brilho (−150..150)', type:'number', min:-150, max:150, step:1, value:0},
         {key:'c', label:'Contraste (−150..150)', type:'number', min:-150, max:150, step:1, value:20},
