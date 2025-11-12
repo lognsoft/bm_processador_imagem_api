@@ -1,3 +1,4 @@
+//mime.ts
 /**
  * Centraliza a decisão do formato de saída considerando alpha, mimetype
  * e extensão do arquivo de entrada, garantindo compatibilidade.

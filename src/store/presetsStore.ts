@@ -1,3 +1,4 @@
+//presetsStore.ts
 /**
  * Gerencia presets em memória e em disco (data/), permitindo criar,
  * listar, atualizar, excluir e publicar/despublicar por slug público.

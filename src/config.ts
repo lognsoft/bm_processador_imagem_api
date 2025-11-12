@@ -1,3 +1,4 @@
+//config.ts
 /**
  * Centraliza configurações globais: níveis de log, diretório de dados
  * e caminhos de persistência (presets e public-presets). Garante que

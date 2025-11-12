@@ -1,3 +1,4 @@
+//sessionsStore.ts
 /**
  * Mantém o estado das sessões em memória: imagem original, lista de passos,
  * último preview em dataURL e metadados. Fornece helpers para CRUD de passos.

@@ -1,3 +1,4 @@
+//pipeline.ts
 /**
  * Orquestra a execução do pipeline: aplica os passos na ordem recebida,
  * preserva metadados e retorna a instância Sharp resultante para encode.

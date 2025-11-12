@@ -1,3 +1,4 @@
+//json-file.ts
 /**
  * Abstrai leitura e escrita de JSON com fallback seguro.
  * Usado para persistir presets e publicações em disco (data/).

@@ -1,3 +1,4 @@
+//presets.ts
 /**
  * Rotas administrativas de presets: listar, renomear, publicar/despublicar
  * e excluir. Suporte para curadoria pelo painel administrativo.

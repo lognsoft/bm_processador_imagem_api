@@ -1,3 +1,4 @@
+//app.ts
 /**
  * Cria e configura a instância do Express. Aplica middlewares globais,
  * JSON parser, CORS permissivo e registra todas as rotas do sistema.

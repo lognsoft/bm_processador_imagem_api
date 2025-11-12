@@ -1,3 +1,4 @@
+//cors.ts
 /**
  * Middleware CORS permissivo para desenvolvimento, aceitando qualquer origem
  * e liberando métodos/headers comuns usados pelo frontend.

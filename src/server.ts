@@ -1,3 +1,4 @@
+//server.ts
 /**
  * Ponto de entrada da aplicação. Sobe o servidor HTTP, carrega o app (Express)
  * e exibe informações de inicialização (porta, versão do Node, diretório de dados).

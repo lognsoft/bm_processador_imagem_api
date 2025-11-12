@@ -1,3 +1,4 @@
+//bytes.ts
 /**
  * Converte valores em bytes para representação humana (B/KB/MB/GB/TB),
  * facilitando logs e diagnósticos de uso de memória/arquivos.

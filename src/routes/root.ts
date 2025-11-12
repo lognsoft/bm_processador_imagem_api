@@ -1,3 +1,4 @@
+//root.ts
 /**
  * Rotas de raiz e documentação rápida dos endpoints (GET /),
  * útil para verificação de saúde e referência rápida da API.

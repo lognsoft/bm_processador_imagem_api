@@ -1,3 +1,4 @@
+//upload.ts
 /**
  * Configura o Multer para uploads em memória, validando tipos compatíveis
  * e limitando o tamanho máximo do arquivo de imagem.

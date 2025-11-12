@@ -1,3 +1,4 @@
+//logger.ts
 /**
  * Logger por requisição com suporte a etapas (step profiling),
  * buffer interno para retorno via API e snapshots de memória.

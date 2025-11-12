@@ -1,3 +1,4 @@
+//time.ts
 /**
  * Utilidades de alta resolução para medir tempo de execução
  * de etapas do pipeline e gerar métricas de performance.

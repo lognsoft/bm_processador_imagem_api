@@ -1,3 +1,4 @@
+//ops.ts
 /**
  * Implementa cada operador do pipeline (bw, bc, shadows, highlights, exposure,
  * levelsOut, normalize, denoise, sharpen, aiEnhance) utilizando Sharp.

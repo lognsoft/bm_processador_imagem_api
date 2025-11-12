@@ -1,3 +1,4 @@
+//sessions.ts
 /**
  * Rotas administrativas de sessão: cria sessão com upload,
  * adiciona/edita/remove passos, exporta resultado e salva preset (com publicação opcional).

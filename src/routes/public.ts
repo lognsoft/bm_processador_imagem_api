@@ -1,3 +1,4 @@
+//public.ts
 /**
  * Rotas públicas: listam presets publicados, retornam detalhes por slug
  * e processam imagens usando um preset público sem acesso ao painel admin.

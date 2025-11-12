@@ -1,3 +1,4 @@
+//strings.ts
 /**
  * Helpers de string usados ao longo do projeto: slugify para URLs públicas
  * e clamp para normalizar valores num intervalo.

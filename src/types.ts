@@ -1,3 +1,4 @@
+//types.ts
 /**
  * Define os tipos centrais do sistema: passos do pipeline, sessões,
  * presets (privados e públicos) e a interface do logger com steps.
