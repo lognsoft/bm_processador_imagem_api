@@ -17,7 +17,7 @@ import { slugify } from '../utils/strings.js';
 export default function sessionRoutes(upload: any) {
   const router = Router();
 
-  router.post('/', upload.single('file'), async (req, res) => {
+  router.post('/docs', upload.single('file'), async (req, res) => {
     const reqId = nextReqId();
     const log = mkLogger(reqId);
     const t0 = nowNs();

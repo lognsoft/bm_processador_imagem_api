@@ -8,7 +8,7 @@ import { slugify } from '../utils/strings.js';
 
 const router = Router();
 
-router.get('/', (_req, res) => {
+router.get('/docs', (_req, res) => {
   const all = listPresets().map(([id, p]) => ({ id, ...p }));
   res.json({ ok:true, presets: all });
 });

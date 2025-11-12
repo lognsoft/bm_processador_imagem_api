@@ -6,7 +6,7 @@ import { Router } from 'express';
 
 const router = Router();
 
-router.get('/', (_req, res) => {
+router.get('/docs', (_req, res) => {
   res.type('text').send(
 `PS Macro API
 POST /sessions                (multipart: file)
