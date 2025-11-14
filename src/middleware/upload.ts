@@ -1,15 +1,20 @@
-//upload.ts
-/**
- * Configura o Multer para uploads em memória, validando tipos compatíveis
- * e limitando o tamanho máximo do arquivo de imagem.
- */
-import multer from 'multer';
+// src/middleware/upload.ts
+import multer, { type FileFilterCallback } from 'multer';
+
+const storage = multer.memoryStorage();
 
 export const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: { fileSize: 25 * 1024 * 1024 },
-  fileFilter: (_req, file, cb) => {
-    const ok = /image\/(jpeg|png|webp|tiff|heic|avif)/i.test(file.mimetype || '');
-    cb(ok ? null : new Error('Mimetype não suportado'), ok);
-  }
+  storage,
+  fileFilter(_req, file, cb: FileFilterCallback) {
+    const ok = /^image\/(jpeg|png|webp|tiff|heic|avif)$/i.test(file.mimetype || '');
+
+    if (!ok) {
+      // rejeita o arquivo com erro
+      return cb(new Error('Mimetype não suportado'));
+    }
+
+    // aceita o arquivo
+    cb(null, true);
+  },
+  limits: { fileSize: 20 * 1024 * 1024 }, // 20 MB
 });
