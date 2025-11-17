@@ -433,6 +433,93 @@ export default function sessionRoutes(upload: any) {
     }
   });
 
+  // aplica um preset existente na sessão atual
+  router.post('/:sid/applyPreset', async (req, res) => {
+    const reqId = nextReqId();
+    const log = mkLogger(reqId);
+    const t0 = nowNs();
+
+    try {
+      const sid = String(req.params.sid);
+      const { presetId } = req.body || {};
+
+      if (!presetId) {
+        return res
+          .status(400)
+          .json({ ok: false, error: 'presetId é obrigatório' });
+      }
+
+      const s = getSession(sid);
+      if (!s) {
+        return res
+          .status(404)
+          .json({ ok: false, error: 'Sessão não encontrada' });
+      }
+
+      const { getPreset } = await import('../store/presetsStore.js');
+      const preset = getPreset(String(presetId));
+
+      if (!preset || !Array.isArray(preset.steps)) {
+        return res
+          .status(404)
+          .json({ ok: false, error: 'Preset não encontrado' });
+      }
+
+      // substitui os passos da sessão pelos passos do preset
+      s.steps = preset.steps.map((x: any) => ({ ...x }));
+
+      const img = await runPipeline(s.original, s.steps, log);
+      const outProbe = await img.metadata();
+
+      const allowedFormats = ['png', 'jpeg', 'webp', 'avif', 'tiff'] as const;
+      type OutFmt = (typeof allowedFormats)[number];
+
+      let outFormat = decideOutFormat(
+        outProbe,
+        'in.png',
+        `image/${outProbe.format || 'png'}`
+      ) as OutFmt;
+
+      const out = await log.step(`Encode preview (${outFormat})`, async () =>
+        img
+          .toFormat(
+            outFormat,
+            outFormat === 'png'
+              ? { compressionLevel: 9 }
+              : { quality: 90 }
+          )
+          .toBuffer()
+      );
+
+      const b64 =
+        `data:image/${outFormat};base64,` + out.toString('base64');
+      setPreview(sid, b64);
+
+      const meta = {
+        width: outProbe.width,
+        height: outProbe.height,
+        format: outFormat.toUpperCase(),
+        hasAlpha: outProbe.hasAlpha,
+      };
+
+      log.info('Tempo total:', `${elapsedMs(t0).toFixed(1)} ms`);
+
+      return res.json({
+        ok: true,
+        steps: s.steps,
+        preview: b64,
+        meta,
+        log: log.lines.join('\n'),
+      });
+    } catch (err: any) {
+      return res.status(500).json({
+        ok: false,
+        error: err?.message || String(err),
+        log: log.lines.join('\n'),
+      });
+    }
+  });
+
   router.post('/:sid/export', async (req, res) => {
     const reqId = nextReqId();
     const log = mkLogger(reqId);

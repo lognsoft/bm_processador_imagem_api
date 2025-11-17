@@ -1,3 +1,5 @@
+//presets.ts
+
 import { Router } from 'express';
 import { listPresets, updatePresetMeta, deletePreset, publishPreset, unpublishSlug } from '../store/presetsStore.js';
 import { slugify } from '../utils/strings.js';

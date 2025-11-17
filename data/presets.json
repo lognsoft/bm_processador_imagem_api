@@ -1,3 +1,195 @@
 {
-  "presets": {}
+  "presets": {
+    "48b8a8ab8453": {
+      "name": "asdfasfa33",
+      "steps": [
+        {
+          "op": "bw",
+          "params": {
+            "r": 92,
+            "y": 94,
+            "g": 40,
+            "c": 60,
+            "b": 34,
+            "m": 80
+          }
+        },
+        {
+          "op": "bc",
+          "params": {
+            "b": 15,
+            "c": 0
+          }
+        },
+        {
+          "op": "shadows",
+          "params": {
+            "intensity": 20,
+            "width": 50,
+            "radius": 30
+          }
+        },
+        {
+          "op": "highlights",
+          "params": {
+            "intensity": 15,
+            "width": 50,
+            "radius": 30
+          }
+        },
+        {
+          "op": "exposure",
+          "params": {
+            "ev": -0.38,
+            "offset": 0.0041,
+            "gamma": 0.95
+          }
+        },
+        {
+          "op": "bc",
+          "params": {
+            "b": 10,
+            "c": 5
+          }
+        },
+        {
+          "op": "levelsOut",
+          "params": {
+            "lo": 15,
+            "hi": 240
+          }
+        },
+        {
+          "op": "bc",
+          "params": {
+            "b": 10,
+            "c": 5
+          }
+        },
+        {
+          "op": "shadows",
+          "params": {
+            "intensity": 45,
+            "width": 50,
+            "radius": 30
+          }
+        },
+        {
+          "op": "highlights",
+          "params": {
+            "intensity": 5,
+            "width": 50,
+            "radius": 30
+          }
+        },
+        {
+          "op": "levelsOut",
+          "params": {
+            "lo": 15,
+            "hi": 240
+          }
+        },
+        {
+          "op": "bc",
+          "params": {
+            "b": 0,
+            "c": 25
+          }
+        },
+        {
+          "op": "levelsOut",
+          "params": {
+            "lo": 25,
+            "hi": 255
+          }
+        },
+        {
+          "op": "bc",
+          "params": {
+            "b": -5,
+            "c": 30
+          }
+        }
+      ],
+      "createdAt": "2025-11-17T13:20:32.343Z",
+      "updatedAt": "2025-11-17T13:20:32.343Z"
+    },
+    "1e132dc19d44": {
+      "name": "teste1",
+      "steps": [
+        {
+          "op": "normalize",
+          "params": {
+            "black": 2,
+            "white": 2
+          }
+        },
+        {
+          "op": "highlights",
+          "params": {
+            "intensity": 10,
+            "width": 50,
+            "radius": 30
+          }
+        },
+        {
+          "op": "bw",
+          "params": {
+            "r": 100,
+            "y": 60,
+            "g": 40,
+            "c": 20,
+            "b": 20,
+            "m": 80,
+            "strength": 70,
+            "contrast": 0
+          }
+        }
+      ],
+      "createdAt": "2025-11-17T13:26:24.843Z",
+      "updatedAt": "2025-11-17T13:26:24.843Z"
+    },
+    "90c0dc05afd2": {
+      "name": "v22",
+      "steps": [
+        {
+          "op": "normalize",
+          "params": {
+            "black": 2,
+            "white": 2
+          }
+        },
+        {
+          "op": "highlights",
+          "params": {
+            "intensity": 10,
+            "width": 50,
+            "radius": 30
+          }
+        },
+        {
+          "op": "bw",
+          "params": {
+            "r": 100,
+            "y": 60,
+            "g": 40,
+            "c": 20,
+            "b": 20,
+            "m": 80,
+            "strength": 70,
+            "contrast": 0
+          }
+        },
+        {
+          "op": "levelsOut",
+          "params": {
+            "lo": 15,
+            "hi": 240
+          }
+        }
+      ],
+      "createdAt": "2025-11-17T13:50:38.974Z",
+      "updatedAt": "2025-11-17T13:50:38.974Z"
+    }
+  }
 }
