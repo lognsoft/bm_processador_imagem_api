@@ -148,6 +148,87 @@ export async function opBW(img: Sharp, params: any, log?: MkLogger) {
   }
 }
 
+/**
+ * Filtro SEPIA clássico (fotografia antiga).
+ *
+ * amount: 0..100  (força do efeito)
+ *
+ * Implementação:
+ *  R' = 0.393R + 0.769G + 0.189B
+ *  G' = 0.349R + 0.686G + 0.168B
+ *  B' = 0.272R + 0.534G + 0.131B
+ *
+ * IMPORTANTE: assim como o opBW, esta função sempre devolve PNG sRGB,
+ * evitando buffers RAW soltos no pipeline.
+ */
+export async function opSepia(img: Sharp, params: any, log?: MkLogger) {
+  const amountPct = clamp(params?.amount ?? 100, 0, 100);
+  const amount = amountPct / 100; // 0..1
+
+  log?.debug?.('[SEPIA] params', { amountPct });
+
+  const meta = await img.metadata();
+
+  // separa alfa se existir
+  let alphaBuf: Buffer | null = null;
+  if (meta.hasAlpha) {
+    alphaBuf = await img
+      .clone()
+      .ensureAlpha()
+      .extractChannel('alpha')
+      .png()
+      .toBuffer();
+  }
+
+  // pega dados brutos da imagem (sem alfa)
+  const { data, info } = await img
+    .clone()
+    .removeAlpha()
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+
+  const out = Buffer.alloc(data.length);
+
+  // matriz clássica de sépia
+  for (let i = 0; i < data.length; i += info.channels) {
+    const r = data[i];
+    const g = data[i + 1];
+    const b = data[i + 2];
+
+    const sr = 0.393 * r + 0.769 * g + 0.189 * b;
+    const sg = 0.349 * r + 0.686 * g + 0.168 * b;
+    const sb = 0.272 * r + 0.534 * g + 0.131 * b;
+
+    // clamp
+    const rr = Math.max(0, Math.min(255, sr));
+    const gg = Math.max(0, Math.min(255, sg));
+    const bb = Math.max(0, Math.min(255, sb));
+
+    // blend: 0 = original, 1 = sépia total
+    out[i]     = rr * amount + r * (1 - amount);
+    out[i + 1] = gg * amount + g * (1 - amount);
+    out[i + 2] = bb * amount + b * (1 - amount);
+  }
+
+  let color = sharp(out, { raw: info }).toColourspace('srgb');
+
+  // *** SEMPRE codificar para PNG antes de devolver ***
+  if (alphaBuf) {
+    const pngBuf = await color
+      .joinChannel(alphaBuf)
+      .toColourspace('srgb')
+      .png()
+      .toBuffer();
+    return sharp(pngBuf).toColourspace('srgb');
+  } else {
+    const pngBuf = await color
+      .toColourspace('srgb')
+      .png()
+      .toBuffer();
+    return sharp(pngBuf).toColourspace('srgb');
+  }
+}
+
 export function opBC(img: Sharp, params: any) {
   const brightnessPct = clamp(params?.b ?? 0, -150, 150);
   const contrastPct = clamp(params?.c ?? 0, -150, 150);

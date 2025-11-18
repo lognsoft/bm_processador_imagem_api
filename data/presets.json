@@ -1,32 +1,39 @@
 {
   "presets": {
-    "48b8a8ab8453": {
-      "name": "asdfasfa33",
+    "337e4cc3e3cb": {
+      "name": "BM01",
       "steps": [
         {
-          "op": "bw",
+          "op": "aiEnhance",
           "params": {
-            "r": 92,
-            "y": 94,
-            "g": 40,
-            "c": 60,
-            "b": 34,
-            "m": 80
+            "enabled": true
           }
         },
         {
-          "op": "bc",
+          "op": "sharpen",
           "params": {
-            "b": 15,
-            "c": 0
+            "amount": 0.2
+          }
+        },
+        {
+          "op": "bw",
+          "params": {
+            "r": 100,
+            "y": 60,
+            "g": 40,
+            "c": 20,
+            "b": 20,
+            "m": 80,
+            "strength": 70,
+            "contrast": 0
           }
         },
         {
           "op": "shadows",
           "params": {
-            "intensity": 20,
+            "intensity": 15,
             "width": 50,
-            "radius": 30
+            "radius": 35
           }
         },
         {
@@ -34,52 +41,14 @@
           "params": {
             "intensity": 15,
             "width": 50,
-            "radius": 30
-          }
-        },
-        {
-          "op": "exposure",
-          "params": {
-            "ev": -0.38,
-            "offset": 0.0041,
-            "gamma": 0.95
+            "radius": 35
           }
         },
         {
           "op": "bc",
           "params": {
-            "b": 10,
-            "c": 5
-          }
-        },
-        {
-          "op": "levelsOut",
-          "params": {
-            "lo": 15,
-            "hi": 240
-          }
-        },
-        {
-          "op": "bc",
-          "params": {
-            "b": 10,
-            "c": 5
-          }
-        },
-        {
-          "op": "shadows",
-          "params": {
-            "intensity": 45,
-            "width": 50,
-            "radius": 30
-          }
-        },
-        {
-          "op": "highlights",
-          "params": {
-            "intensity": 5,
-            "width": 50,
-            "radius": 30
+            "b": 0,
+            "c": 10
           }
         },
         {
@@ -93,7 +62,7 @@
           "op": "bc",
           "params": {
             "b": 0,
-            "c": 25
+            "c": 5
           }
         },
         {
@@ -104,92 +73,23 @@
           }
         },
         {
+          "op": "highlights",
+          "params": {
+            "intensity": 15,
+            "width": 50,
+            "radius": 30
+          }
+        },
+        {
           "op": "bc",
           "params": {
-            "b": -5,
-            "c": 30
+            "b": 0,
+            "c": 5
           }
         }
       ],
-      "createdAt": "2025-11-17T13:20:32.343Z",
-      "updatedAt": "2025-11-17T13:20:32.343Z"
-    },
-    "1e132dc19d44": {
-      "name": "teste1",
-      "steps": [
-        {
-          "op": "normalize",
-          "params": {
-            "black": 2,
-            "white": 2
-          }
-        },
-        {
-          "op": "highlights",
-          "params": {
-            "intensity": 10,
-            "width": 50,
-            "radius": 30
-          }
-        },
-        {
-          "op": "bw",
-          "params": {
-            "r": 100,
-            "y": 60,
-            "g": 40,
-            "c": 20,
-            "b": 20,
-            "m": 80,
-            "strength": 70,
-            "contrast": 0
-          }
-        }
-      ],
-      "createdAt": "2025-11-17T13:26:24.843Z",
-      "updatedAt": "2025-11-17T13:26:24.843Z"
-    },
-    "90c0dc05afd2": {
-      "name": "v22",
-      "steps": [
-        {
-          "op": "normalize",
-          "params": {
-            "black": 2,
-            "white": 2
-          }
-        },
-        {
-          "op": "highlights",
-          "params": {
-            "intensity": 10,
-            "width": 50,
-            "radius": 30
-          }
-        },
-        {
-          "op": "bw",
-          "params": {
-            "r": 100,
-            "y": 60,
-            "g": 40,
-            "c": 20,
-            "b": 20,
-            "m": 80,
-            "strength": 70,
-            "contrast": 0
-          }
-        },
-        {
-          "op": "levelsOut",
-          "params": {
-            "lo": 15,
-            "hi": 240
-          }
-        }
-      ],
-      "createdAt": "2025-11-17T13:50:38.974Z",
-      "updatedAt": "2025-11-17T13:50:38.974Z"
+      "createdAt": "2025-11-13T19:21:16.459Z",
+      "updatedAt": "2025-11-13T19:21:16.459Z"
     }
   }
 }

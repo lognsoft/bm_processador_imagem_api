@@ -1,12 +1,21 @@
-//types.ts
+// types.ts
 /**
  * Define os tipos centrais do sistema: passos do pipeline, sessões,
  * presets (privados e públicos) e a interface do logger com steps.
  * Fornece IntelliSense e consistência entre módulos.
  */
 export type StepOp =
-  | 'bw' | 'bc' | 'shadows' | 'highlights' | 'exposure'
-  | 'levelsOut' | 'normalize' | 'denoise' | 'sharpen' | 'aiEnhance';
+  | 'bw'
+  | 'sepia'       // 👈 novo filtro
+  | 'bc'
+  | 'shadows'
+  | 'highlights'
+  | 'exposure'
+  | 'levelsOut'
+  | 'normalize'
+  | 'denoise'
+  | 'sharpen'
+  | 'aiEnhance';
 
 export interface Step {
   op: StepOp;
